@@ -1,13 +1,12 @@
-﻿using System;
-using CUE4Parse.UE4.Objects.Core.Misc;
+﻿using CUE4Parse.UE4.Objects.Core.Misc;
 using CUE4Parse.UE4.Objects.Core.Serialization;
 using CUE4Parse.UE4.Readers;
 using CUE4Parse.UE4.Versions;
 using Newtonsoft.Json;
 
-namespace FriendlyChess.Framework.Unreal.Parser;
+namespace UnrealSaveDumper;
 
-public enum ESaveGameFileVersion
+public enum ESaveGameFileVersion : int
 {
     InitialVersion = 1,
 
@@ -34,7 +33,7 @@ public class FSaveGameHeader
     public FCustomVersionContainer CustomVersions = new();
     public string SaveGameClassName;
 
-    public void Deserialize(FArchive Ar)
+    public FArchive Deserialize(FArchive Ar, string gameName = "")
     {
         FileTypeTag = Ar.Read<uint>();
 
@@ -42,10 +41,12 @@ public class FSaveGameHeader
         {
             if (FileTypeTag != 0x44464345 && FileTypeTag != 0x8C1809A0 && FileTypeTag != 0xF057217E && FileTypeTag != 0xA2189DE9) Ar.Position = 0;
             SaveGameFileVersion = ESaveGameFileVersion.InitialVersion;
-            return;
+            return Ar;
         }
 
         SaveGameFileVersion = Ar.Read<ESaveGameFileVersion>();
+        if (gameName.Equals("Dayton", StringComparison.OrdinalIgnoreCase)) SaveGameFileVersion -= 2;
+
         PackageFileUEVersion = SaveGameFileVersion >= ESaveGameFileVersion.PackageFileSummaryVersionChange ? Ar.Read<FPackageFileVersion>() : FPackageFileVersion.CreateUE4Version(Ar.Read<int>());
         SavedEngineVersion = new FEngineVersion(Ar);
 
@@ -57,7 +58,10 @@ public class FSaveGameHeader
             CustomVersions = new FCustomVersionContainer(Ar, CustomVersionFormat);
         }
 
+        if (gameName.Equals("Dayton", StringComparison.OrdinalIgnoreCase)) Ar.Position += 4;
+
         SaveGameClassName = Ar.ReadFString();
+        return Ar;
     }
 }
 
@@ -93,6 +97,7 @@ public class FSaveGameHeaderConverter : JsonConverter<FSaveGameHeader>
 
         if (value.CustomVersions is { Versions.Length: > 0 })
         {
+            writer.WritePropertyName("CustomVersions");
             serializer.Serialize(writer, value.CustomVersions);
         }
 

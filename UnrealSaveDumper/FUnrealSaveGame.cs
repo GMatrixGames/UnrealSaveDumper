@@ -1,12 +1,12 @@
-using System;
-using System.IO;
+using CUE4Parse.FileProvider;
 using CUE4Parse.UE4.Assets.Objects;
+using CUE4Parse.UE4.Assets.Readers;
 using CUE4Parse.UE4.Readers;
 using CUE4Parse.UE4.Versions;
-using MercuryCommons.Utilities.Extensions;
 using Newtonsoft.Json;
+using UnrealSaveDumper.GameSpecific;
 
-namespace FriendlyChess.Framework.Unreal.Parser;
+namespace UnrealSaveDumper;
 
 [JsonConverter(typeof(FSaveGameConverter))]
 public class FSaveGame
@@ -14,13 +14,16 @@ public class FSaveGame
     public FSaveGameHeader Header;
     public FStructFallback SaveGameObject;
 
-    public FSaveGame(byte[] archive, string name = "Unnamed save game")
+    public FSaveGame(byte[] archive, IFileProvider provider, string gameName = "", string name = "Unnamed save game")
     {
         Header = new FSaveGameHeader();
-        Header.Deserialize(new FByteArchive(name, archive, new VersionContainer(EGame.GAME_UE5_1)));
+        var Ar = Header.Deserialize(new FByteArchive(name, archive), gameName);
+        if (Ar.Game == EGame.GAME_StateOfDecay2) return; // State of Decay 2 has some *issues*
+        var proxyArchive = new FObjectAndNameAsStringProxyArchive(Ar, new EmptyPackage("nothing", provider, provider.MappingsForGame));
+        SaveGameObject = new FStructFallback(proxyArchive, "None");
     }
 
-    public FSaveGame(FileStream file) : this(file.ReadToEnd(), file.Name) { }
+    public FSaveGame(FileStream file, IFileProvider provider) : this(file.ReadToEnd(), provider, file.Name) { }
 
     public FSaveGame()
     {

@@ -4,9 +4,8 @@ using CUE4Parse.UE4.Objects.Core.Misc;
 using CUE4Parse.UE4.Objects.Core.Serialization;
 using CUE4Parse.UE4.Readers;
 using CUE4Parse.UE4.Versions;
-using UnrealSaveDumper;
 
-namespace FriendlyChess.Framework.Fortnite.Parser;
+namespace UnrealSaveDumper.GameSpecific;
 
 public class FFortSaveGameHeader : FSaveGameHeader
 {
