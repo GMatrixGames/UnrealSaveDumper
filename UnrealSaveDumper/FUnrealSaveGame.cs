@@ -23,8 +23,6 @@ public class FSaveGame
         SaveGameObject = new FStructFallback(proxyArchive, "None");
     }
 
-    public FSaveGame(FileStream file, IFileProvider provider) : this(file.ReadToEnd(), provider, file.Name) { }
-
     public FSaveGame()
     {
         Header = null;

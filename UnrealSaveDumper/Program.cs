@@ -40,9 +40,9 @@ AnsiConsole.WriteLine($"Selected game name is: {gameName}");
 
 var fileName = Path.GetFileName(savFile);
 var emptyProvider = new DefaultFileProvider(Directory.GetCurrentDirectory(), SearchOption.TopDirectoryOnly, true);
-var mappingsPath = AnsiConsole.Ask("Path to a [blue]mapping (.usmap)[/] (if applicable).", string.Empty).Replace("\"", "");
+var mappingsPath = AnsiConsole.Ask("Path to a [blue]mapping (.usmap)[/] (if applicable).", "None").Replace("\"", "");
 
-if (!string.IsNullOrWhiteSpace(mappingsPath)) emptyProvider.MappingsContainer = new FileUsmapTypeMappingsProvider(mappingsPath);
+if (!string.IsNullOrWhiteSpace(mappingsPath) && !mappingsPath.Equals("None", StringComparison.OrdinalIgnoreCase)) emptyProvider.MappingsContainer = new FileUsmapTypeMappingsProvider(mappingsPath);
 
 var data = File.ReadAllBytes(savFile);
 var saveGame = gameName != "FortniteGame" ? new FSaveGame(data, emptyProvider, gameName, fileName) : new FFortSaveGame(data, emptyProvider, fileName);

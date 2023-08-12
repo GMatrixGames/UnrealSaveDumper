@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace UnrealSaveDumper;
 
-public enum ESaveGameFileVersion : int
+public enum ESaveGameFileVersion
 {
     InitialVersion = 1,
 
@@ -54,7 +54,7 @@ public class FSaveGameHeader
 
         if (SaveGameFileVersion >= ESaveGameFileVersion.AddedCustomVersions)
         {
-            CustomVersionFormat = Ar.Read<ECustomVersionSerializationFormat>();
+            CustomVersionFormat = (ECustomVersionSerializationFormat) Ar.Read<int>();
             CustomVersions = new FCustomVersionContainer(Ar, CustomVersionFormat);
         }
 

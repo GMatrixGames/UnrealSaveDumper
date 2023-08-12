@@ -11,7 +11,7 @@ public class FFortSaveGameHeader : FSaveGameHeader
 {
     public FArchive Deserialize(byte[] archive, string name)
     {
-        var Ar = Deserialize(new FByteArchive(name, archive));
+        var Ar = Deserialize(new FByteArchive(name, archive), "FortniteGame");
 
         if (FileTypeTag == 0x44464345 && Ar.Read<uint>() == 0xF619 && Ar.Read<int>() == 1)
         {
@@ -39,7 +39,7 @@ public class FFortSaveGameHeader : FSaveGameHeader
         if (FileTypeTag != 0xF057217E)
         {
             serializeCustomVersions = Ar.ReadFlag();
-            CustomVersionFormat = Ar.Read<ECustomVersionSerializationFormat>();
+            CustomVersionFormat = (ECustomVersionSerializationFormat) Ar.Read<byte>();
         }
 
         CustomVersions = serializeCustomVersions ? new FCustomVersionContainer(Ar, CustomVersionFormat) : new FCustomVersionContainer();
