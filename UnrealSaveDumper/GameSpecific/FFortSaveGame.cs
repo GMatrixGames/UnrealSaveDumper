@@ -14,6 +14,7 @@ public class FFortSaveGame : FSaveGame
     {
         Header = new FFortSaveGameHeader();
         var Ar = ((FFortSaveGameHeader) Header).Deserialize(archive, name);
+        if (provider.MappingsForGame == null) return; // we need mappings for properties
         var proxyArchive = new FObjectAndNameAsStringProxyArchive(Ar, new EmptyPackage("nothing", provider, provider.MappingsForGame));
         SaveGameObject = new FStructFallback(proxyArchive, "None");
     }
@@ -27,7 +28,7 @@ public sealed class EmptyPackage(string name, IFileProvider provider, TypeMappin
     public override ResolvedObject ResolvePackageIndex(FPackageIndex index) => throw new NotImplementedException();
 
     public override FPackageFileSummary Summary { get; } = new();
-    public override FNameEntrySerialized[] NameMap { get; } = Array.Empty<FNameEntrySerialized>();
-    public override Lazy<UObject>[] ExportsLazy { get; } = Array.Empty<Lazy<UObject>>();
+    public override FNameEntrySerialized[] NameMap { get; } = [];
+    public override Lazy<UObject>[] ExportsLazy { get; } = [];
     public override bool IsFullyLoaded => true;
 }

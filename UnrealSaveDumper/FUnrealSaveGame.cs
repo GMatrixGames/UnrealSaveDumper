@@ -23,7 +23,7 @@ public class FSaveGame
         SaveGameObject = new FStructFallback(proxyArchive, "None");
     }
 
-    public FSaveGame()
+    protected FSaveGame()
     {
         Header = null;
         SaveGameObject = null;
