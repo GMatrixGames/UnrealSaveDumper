@@ -43,15 +43,15 @@ var fileName = Path.GetFileName(savFile);
 var emptyProvider = new DefaultFileProvider(Directory.GetCurrentDirectory(), SearchOption.TopDirectoryOnly, true);
 var mappingsPath = AnsiConsole.Ask("Path to a [blue]mapping (.usmap)[/] (if applicable).", "None").Replace("\"", "");
 
-var oodlePath = Path.Combine(Directory.GetCurrentDirectory(), OodleHelper.OODLE_DLL_NAME);
+var oodlePath = Path.Combine(Directory.GetCurrentDirectory(), OodleHelper.OODLE_NAME_CURRENT);
 
-if (File.Exists(OodleHelper.OODLE_DLL_NAME))
+if (File.Exists(OodleHelper.OODLE_NAME_CURRENT))
 {
-    File.Move(OodleHelper.OODLE_DLL_NAME, oodlePath, true);
+    File.Move(OodleHelper.OODLE_NAME_CURRENT, oodlePath, true);
 }
 else if (!File.Exists(oodlePath))
 {
-    await OodleHelper.DownloadOodleDllAsync(oodlePath);
+    await OodleHelper.DownloadOodleDllAsync();
 }
 
 OodleHelper.Initialize(oodlePath);

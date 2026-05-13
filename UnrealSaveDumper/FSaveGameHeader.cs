@@ -35,6 +35,7 @@ public class FSaveGameHeader
 
     public FArchive Deserialize(FArchive Ar, string gameName = "")
     {
+        if (gameName.Equals("SN2", StringComparison.OrdinalIgnoreCase)) Ar.Position = 16;
         FileTypeTag = Ar.Read<uint>();
 
         if (FileTypeTag != UE_SAVEGAME_FILE_TYPE_TAG)
@@ -46,8 +47,13 @@ public class FSaveGameHeader
 
         SaveGameFileVersion = Ar.Read<ESaveGameFileVersion>();
         if (gameName.Equals("Dayton", StringComparison.OrdinalIgnoreCase)) SaveGameFileVersion -= 2;
+        if (gameName.Equals("SN2", StringComparison.OrdinalIgnoreCase)) {
+            PackageFileUEVersion = new FPackageFileVersion(Ar.Read<int>(), Ar.Read<int>());
+            goto SkipPackageFileUEVersion;
+        }
 
         PackageFileUEVersion = SaveGameFileVersion >= ESaveGameFileVersion.PackageFileSummaryVersionChange ? Ar.Read<FPackageFileVersion>() : FPackageFileVersion.CreateUE4Version(Ar.Read<int>());
+        SkipPackageFileUEVersion: 
         SavedEngineVersion = new FEngineVersion(Ar);
 
         Ar.Ver = PackageFileUEVersion;
@@ -61,6 +67,7 @@ public class FSaveGameHeader
         if (gameName.Equals("Dayton", StringComparison.OrdinalIgnoreCase)) Ar.Position += 4;
 
         SaveGameClassName = Ar.ReadFString();
+        if (gameName.Equals("SN2", StringComparison.OrdinalIgnoreCase)) Ar.Position += 1;
         return Ar;
     }
 }
